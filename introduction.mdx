@@ -13,7 +13,7 @@ Cody's Shack Games is a self-deployable browser game portal built on top of [3kh
 ## Key features
 
 - **147+ embedded games** — all game assets are bundled inside the `projects/` folder and served directly from your host; no third-party game CDN required.
-- **No ads, no tracking** — there are no ad networks, no analytics scripts injected into game pages, and no user accounts.
+- **No ads, no user accounts** — there are no ad networks and no login or registration system. Note that the original `index.html` does include Firebase Analytics; if you prefer a fully tracking-free deployment, remove the Firebase `<script>` block before hosting.
 - **Tab cloaker** — the Settings page (`misc.html`) lets users change the browser tab title and favicon on the fly via `localStorage`, making the site appear to be something else at a glance.
 - **Website proxies** — the Websites section (`apps.html`) embeds popular sites (YouTube, Discord, Spotify, Reddit, and more) inside iframe proxy pages so they can be accessed from restricted networks.
 - **Movie streaming** — the Movies page provides an embedded streaming interface alongside the game and app sections.

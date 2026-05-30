@@ -1,5 +1,5 @@
 ---
-title: "Customize the Look and Feel of Cody's Shack"
+title: "Customize the Look and Feel of Cody's Shack Game Site"
 sidebarTitle: "UI Styling"
 description: "Learn how to customize backgrounds, color accents, glow effects, glassmorphism panels, and game tile appearance across Cody's Shack."
 ---
@@ -112,7 +112,13 @@ Directly below the site title on the homepage, a randomized subtitle line is inj
 
 ```javascript
 function getRandomGreeting() {
-  var greetings = [ /* array of strings */ ];
+  var greetings = [
+    "Beep boop! Are you a robot?",
+    "Did you know I have a discord server?",
+    "Reload the page NOW!",
+    "Downloading your passwords...",
+    // ... 70+ additional entries ...
+  ];
   var randomIndex = Math.floor(Math.random() * greetings.length);
   return greetings[randomIndex];
 }
