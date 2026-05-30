@@ -1,0 +1,116 @@
+---
+title: "Configure Cody's Shack Games with JSON Files"
+sidebarTitle: "Configuration"
+description: "All site configuration lives in the config/ directory. Edit two JSON files to control which games and website proxies appear on your instance."
+---
+
+All site configuration is driven by two JSON files in the `config/` directory. There are no environment variables, no admin panels, and no database records to manage — every change is made directly in `config/games.json` or `config/apps.json`, then committed and redeployed. The tab-cloaking settings are the only exception: those are stored in the visitor's browser via `localStorage` and are managed through the Settings page.
+
+---
+
+## config/games.json
+
+`projects.html` fetches `config/games.json` at runtime and uses it to render every tile on the Games page. The file is a JSON array of game objects listed in the order they should appear on the page.
+
+### Schema
+
+<ParamField body="title" type="string" required>
+  The display name shown on the game tile beneath the thumbnail. This value is also used by the search filter — the filter matches against `title` case-insensitively.
+</ParamField>
+
+<ParamField body="link" type="string" required>
+  Relative URL to the game's entry point, typically the `index.html` inside its subdirectory under `/projects/`. For example: `projects/2048/index.html`. Can also be an absolute URL if the game is hosted externally.
+</ParamField>
+
+<ParamField body="imgSrc" type="string" required>
+  Relative or absolute URL of the thumbnail/icon image displayed on the game tile. The tile renders icons at 210×210 px with rounded corners. Relative paths resolve from the site root (e.g. `projects/among-us/red.png`).
+</ParamField>
+
+### Example entries
+
+The following snippet shows three real entries from `config/games.json`:
+
+```json
+[
+  {
+    "link": "projects/2048/index.html",
+    "imgSrc": "projects/2048/thumb.png",
+    "title": "2048"
+  },
+  {
+    "link": "projects/1v1lol/",
+    "imgSrc": "projects/1v1lol/1v1lol.png",
+    "title": "1v1.LOL"
+  },
+  {
+    "link": "projects/among-us/index.html",
+    "imgSrc": "projects/among-us/red.png",
+    "title": "Among Us"
+  }
+]
+```
+
+<Note>
+  Games are rendered in the exact order they appear in the array. To reorder the game list, simply rearrange the entries in the file and redeploy.
+</Note>
+
+---
+
+## config/apps.json
+
+`apps.html` fetches `config/apps.json` at runtime and renders the Website Proxies page. The schema is identical to `games.json`, but the `link` field points to an HTML file inside the `/apps/` directory, and `imgSrc` typically references an absolute CDN URL for the service's official logo.
+
+### Schema
+
+<ParamField body="title" type="string" required>
+  The display name of the website or service shown on the proxy tile (e.g. `"YouTube"`, `"Discord"`).
+</ParamField>
+
+<ParamField body="link" type="string" required>
+  Relative path to the proxy wrapper HTML file inside `/apps/`. For example: `apps/youtube.html`. Each file in `/apps/` embeds the target site in an iframe or redirects to it.
+</ParamField>
+
+<ParamField body="imgSrc" type="string" required>
+  URL of the service logo used as the tile thumbnail. Absolute CDN URLs are common here since the logos are fetched from external sources rather than stored in the repository.
+</ParamField>
+
+### Example entries
+
+The following snippet shows three real entries from `config/apps.json`:
+
+```json
+[
+  {
+    "link": "apps/youtube.html",
+    "imgSrc": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/YouTube_social_white_square_%282017%29.svg/2048px-YouTube_social_white_square_%282017%29.svg.png",
+    "title": "YouTube"
+  },
+  {
+    "link": "apps/discord.html",
+    "imgSrc": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/198142ac-f410-423a-bf0b-34c9cb5d9609/dbtif5j-60306864-d6b7-44b6-a9ff-65e8adcfb911.png",
+    "title": "Discord"
+  },
+  {
+    "link": "apps/spotify.html",
+    "imgSrc": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/2048px-Spotify_logo_without_text.svg.png",
+    "title": "Spotify"
+  }
+]
+```
+
+---
+
+## Tab Cloaker Settings (localStorage)
+
+The tab-cloaking feature lets visitors disguise the site's browser tab with a custom title and favicon — useful for making the tab look like something else at a glance. These settings are stored in the visitor's browser using the Web Storage API and are applied globally across all pages via `js/main.js`.
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `title` | `string` | The replacement text shown in the browser tab title bar. |
+| `icon` | `string` | An absolute URL to a replacement favicon image shown in the browser tab. |
+
+`js/main.js` reads both keys on every page load and, if present, updates `document.title` and the `<link rel="icon">` element accordingly. Visitors configure these values through the **Settings** page (`misc.html`) — they are not set in any config file on the server.
+
+<Info>
+  Because these values live in the browser's `localStorage`, they are specific to each visitor's device and browser profile. Clearing browser data will reset them to the site defaults.
+</Info>

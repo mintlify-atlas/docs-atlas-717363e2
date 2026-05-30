@@ -1,0 +1,92 @@
+---
+title: "Add Custom Games to Your Cody's Shack Instance"
+sidebarTitle: "Adding Games"
+description: "Add any HTML5 game to your self-hosted Cody's Shack instance by placing files in /projects/ and adding a single entry to config/games.json."
+---
+
+Adding a game to your Cody's Shack instance is a two-part process: the game files go into a dedicated subdirectory under `/projects/`, and a matching entry is added to `config/games.json` so the Games page knows to display it. No code changes, no build step — just files and a JSON entry. The sections below walk through the full process step by step.
+
+## Step-by-Step: Adding a Game
+
+<Steps>
+  <Step title="Create a folder under /projects/">
+    Choose a short, URL-friendly slug for your game (lowercase letters, numbers, and hyphens only — no spaces). Create a directory at `projects/my-game/`. The folder name becomes part of the URL that loads the game.
+  </Step>
+  <Step title="Add the game files">
+    Copy all of the game's HTML, JavaScript, CSS, and asset files into the folder you just created. The entry point **must** be named `index.html` at the root of that subdirectory — this is what the tile link points to.
+
+    A typical game folder looks like this:
+    ```
+    projects/
+    └── my-game/
+        ├── index.html
+        ├── game.js
+        ├── style.css
+        └── assets/
+            └── ...
+    ```
+  </Step>
+  <Step title="Add a thumbnail image">
+    Place a square icon or thumbnail image in the game folder (e.g. `projects/my-game/icon.png`). This image is displayed on the game tile on the Games page.
+
+    <Tip>
+      The game tile renders thumbnails at **210×210 px** with rounded corners. Use a square image at least 210×210 px to avoid stretching or blurring. PNG and JPG both work; PNG is preferred for logos and pixel art, JPG for photographic screenshots.
+    </Tip>
+  </Step>
+  <Step title="Add an entry to config/games.json">
+    Open `config/games.json` and append a new object to the JSON array. Use the folder name and image path you chose in the previous steps:
+
+    ```json
+    {
+      "link": "projects/my-game/index.html",
+      "imgSrc": "projects/my-game/icon.png",
+      "title": "My Game"
+    }
+    ```
+
+    The full file should remain a valid JSON array — make sure to add a comma after the preceding entry if your new entry is not the last one.
+  </Step>
+  <Step title="Save and redeploy">
+    Commit your changes and push to your hosting branch. For platforms that auto-deploy on push (GitHub Pages, Netlify, Vercel), the game will appear live within a few minutes. For manually managed servers, copy the new files and the updated `config/games.json` to your web root and the game will be immediately available.
+  </Step>
+</Steps>
+
+---
+
+## Tips and Gotchas
+
+<Warning>
+  **Flash games will not work in modern browsers.** Adobe Flash Player reached end-of-life in December 2020 and has been permanently removed from all major browsers. Do not attempt to add `.swf`-based Flash games — they will display a broken plugin error. Stick to HTML5 games that run natively in the browser using JavaScript and the Canvas API.
+</Warning>
+
+**Test locally before deploying.** Before committing and pushing, spin up a local HTTP server from the project root to confirm the game loads correctly:
+
+```bash
+python3 -m http.server 8000
+```
+
+Then open `http://localhost:8000/projects/my-game/index.html` in your browser. This catches path issues, missing assets, and CORS errors before they reach your live site.
+
+**Use descriptive, URL-friendly folder names.** Prefer `projects/cookie-clicker/` over `projects/game1/`. Descriptive slugs make the codebase easier to navigate and produce readable URLs.
+
+**For very large games, consider external asset hosting.** If the game's assets push the repository size to a level that causes upload timeouts on free-tier hosts, host the assets on a CDN or VPS and set the `link` field in `config/games.json` to the full external URL:
+
+```json
+{
+  "link": "https://cdn.example.com/my-game/index.html",
+  "imgSrc": "projects/my-game/icon.png",
+  "title": "My Game"
+}
+```
+
+The `imgSrc` thumbnail can still be served locally even if the game itself is hosted externally.
+
+---
+
+## Removing a Game
+
+To remove a game from the Games page, delete its entry from `config/games.json` and redeploy. The game will immediately disappear from the tile grid. The files in `/projects/` can be left in place (they will simply become unreachable from the UI) or deleted to reclaim disk space — either approach works.
+
+<Note>
+  Removing the entry from `config/games.json` is always required to hide the game. Deleting only the files in `/projects/` without updating the JSON will leave a broken tile on the Games page that attempts to load a missing page.
+</Note>

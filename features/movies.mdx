@@ -1,0 +1,54 @@
+---
+title: "Movie Streaming: Watch Films Directly in Cody's Shack"
+sidebarTitle: "Movies"
+description: "Search and stream movies without leaving Cody's Shack — a third-party streaming interface is embedded directly in a full-page iframe."
+---
+
+The Movies page (`movies.html`) is the simplest page on the site: it embeds a third-party streaming search interface inside a full-page, borderless iframe so you can search for and watch films without ever navigating away from Cody's Shack. There is nothing to configure, no account to create, and no extra extension to install — just click **Movies** in the navigation bar and start searching.
+
+## How the Page Is Built
+
+The entire `movies.html` file is deliberately minimal. The `<body>` contains only a single iframe that fills the full viewport:
+
+```html
+<!doctype html>
+<html style="margin: 0; padding: 0; height: 100%; overflow: hidden;">
+  <head>
+    <title>Movies | Cody's Shack</title>
+  </head>
+  <body style="margin: 0; padding: 0; height: 100%; overflow: hidden;">
+    <iframe
+      src="https://explo4er.basualdo.cl/embed?search=https://arc018.to/"
+      width="100%"
+      height="100%"
+      style="border: 0px;"
+    ></iframe>
+  </body>
+</html>
+```
+
+The iframe source is `https://explo4er.basualdo.cl/embed?search=https://arc018.to/`, which is a third-party search-and-embed service. The `search` query parameter points it at the streaming index at `arc018.to`, giving you a fully functional movie search interface right inside the page.
+
+## Using the Movies Page
+
+<Steps>
+  <Step title="Navigate to Movies">
+    Click **Movies** in the top navigation bar, or go to `/movies.html` directly in your browser.
+  </Step>
+  <Step title="Search for a title">
+    Use the embedded search bar to type a movie name. Results are pulled from the third-party streaming index in real time.
+  </Step>
+  <Step title="Select and watch">
+    Click a result to load the player. The video streams inside the same iframe — no pop-ups, no redirects, and no separate tabs required.
+  </Step>
+</Steps>
+
+## Important Notes
+
+<Note>
+  Cody's Shack **does not host any video content**. All streams originate from the third-party service at `explo4er.basualdo.cl`, which itself indexes content from `arc018.to`. Title availability, stream quality, and uptime are entirely dependent on those external services and may change at any time without notice.
+</Note>
+
+<Warning>
+  If the Movies page appears blank or fails to load, the embedded streaming service may be temporarily unavailable or its URL may have changed upstream. Cody's Shack has no control over the availability of this service.
+</Warning>

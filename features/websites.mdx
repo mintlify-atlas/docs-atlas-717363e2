@@ -1,0 +1,133 @@
+---
+title: "Website Proxies: Access Popular Sites Through Cody's Shack"
+sidebarTitle: "Websites"
+description: "Open YouTube, Discord, Spotify, Reddit, and more inside Cody's Shack via full-page iframes — no extra tabs, no navigation away."
+---
+
+The Websites page (`apps.html`) gives you quick access to nine popular websites without ever leaving Cody's Shack. Just like the game library, the page fetches `config/apps.json` at runtime and renders a tile grid of supported apps. Clicking any tile opens the site in a full-page iframe embedded directly in the Cody's Shack window. A live search bar lets you filter the tile grid by name as you type.
+
+## How It Works
+
+The page uses the same fetch-and-render pattern as the game library. On load, it reads `config/apps.json`, builds a tile for each app, and hides the loading spinner once rendering is complete:
+
+```javascript
+let games = [];
+fetch("config/apps.json")
+  .then((response) => response.json())
+  .then((data) => {
+    games = data;
+    const container = document.getElementById("game-container");
+    data.forEach((project) => {
+      const game = document.createElement("a");
+      game.href = project.link;
+      game.className = "game-link container";
+      game.innerHTML = `
+        <div class="game-tile gameblur">
+          <img class="game-icon" src="${project.imgSrc}" alt="icon" />
+          <p class="game-title">${project.title}</p>
+        </div>`;
+      container.appendChild(game);
+    });
+    document.getElementById("loader").style.display = "none";
+  });
+```
+
+Each `link` in `apps.json` points to a file inside the `/apps/` subdirectory (e.g. `apps/youtube.html`). That file contains nothing but a borderless, full-viewport `<iframe>` pointed at the real website URL.
+
+## App Catalog Format
+
+Each entry in `config/apps.json` follows the same three-field schema used by the game catalog:
+
+```json
+[
+  {
+    "link": "apps/youtube.html",
+    "imgSrc": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/YouTube_social_white_square_%282017%29.svg/2048px-YouTube_social_white_square_%282017%29.svg.png",
+    "title": "YouTube"
+  },
+  {
+    "link": "apps/discord.html",
+    "imgSrc": "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/198142ac-f410-423a-bf0b-34c9cb5d9609/dbtif5j-60306864-d6b7-44b6-a9ff-65e8adcfb911.png",
+    "title": "Discord"
+  }
+]
+```
+
+| Field      | Description                                                        |
+| ---------- | ------------------------------------------------------------------ |
+| `link`     | Path to the wrapper HTML file inside `/apps/` that hosts the iframe |
+| `imgSrc`   | URL of the app's logo used on the tile                             |
+| `title`    | Display name shown beneath the icon                                |
+
+## Available Apps
+
+<CardGroup cols={3}>
+  <Card title="YouTube" icon="youtube">
+    Stream videos, browse your subscriptions, and search without opening a new tab.
+  </Card>
+  <Card title="Twitch" icon="twitch">
+    Watch live streams and VODs from your favourite creators.
+  </Card>
+  <Card title="Discord" icon="discord">
+    Access your Discord servers directly from the site.
+  </Card>
+  <Card title="Spotify" icon="spotify">
+    Play music and podcasts while you game, without switching windows.
+  </Card>
+  <Card title="X (Twitter)" icon="x-twitter">
+    Browse your X / Twitter timeline inline.
+  </Card>
+  <Card title="Google" icon="google">
+    Full Google Search embedded inside Cody's Shack.
+  </Card>
+  <Card title="TikTok" icon="tiktok">
+    Scroll your For You feed without leaving the game site.
+  </Card>
+  <Card title="Cool Math Games" icon="calculator">
+    The classic educational game site, embedded for extra cover.
+  </Card>
+  <Card title="Reddit" icon="reddit">
+    Browse subreddits and posts in a full-page iframe.
+  </Card>
+</CardGroup>
+
+## Known Limitation: X-Frame-Options
+
+<Warning>
+  Not every website can be embedded in an iframe. Some services — including parts of X (Twitter) and occasionally Discord — send an `X-Frame-Options: DENY` or `Content-Security-Policy: frame-ancestors 'none'` header, which causes the browser to refuse to display the page inside a frame. If a tile loads a blank or error screen, this header is the most likely cause. There is no workaround short of the third-party site removing the restriction.
+</Warning>
+
+## Adding Your Own App
+
+To add a new site to the grid, create a wrapper file in `/apps/` and add an entry to `config/apps.json`:
+
+<Steps>
+  <Step title="Create the wrapper HTML">
+    Add a new file, e.g. `apps/mysite.html`, with a full-viewport iframe:
+
+    ```html
+    <!doctype html>
+    <html style="margin:0;padding:0;height:100%;overflow:hidden;">
+      <head><title>My Site | Cody's Shack</title></head>
+      <body style="margin:0;padding:0;height:100%;overflow:hidden;">
+        <iframe src="https://mysite.com" width="100%" height="100%"
+                style="border:0;"></iframe>
+      </body>
+    </html>
+    ```
+  </Step>
+  <Step title="Add the entry to apps.json">
+    Open `config/apps.json` and append a new object to the array:
+
+    ```json
+    {
+      "link": "apps/mysite.html",
+      "imgSrc": "https://mysite.com/favicon.png",
+      "title": "My Site"
+    }
+    ```
+  </Step>
+  <Step title="Verify the result">
+    Navigate to `apps.html` — your new tile will appear in the grid automatically. Use the search bar to confirm it is filterable by name.
+  </Step>
+</Steps>

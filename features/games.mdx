@@ -1,0 +1,205 @@
+---
+title: "Game Library: 147+ Browser Games at Your Fingertips"
+sidebarTitle: "Games"
+description: "Browse, search, and play 147+ self-hosted browser games — no ads, no sign-ups, just instant fun straight from Cody's Shack."
+---
+
+The Games page (`projects.html`) is the heart of Cody's Shack. When you visit it, the page fetches `config/games.json` at runtime and dynamically renders every game as a clickable tile — no page rebuilds required. Each tile displays a rounded game icon and title on a frosted-glass card that smoothly scales up on hover. A live search bar at the top of the page lets you filter the full library instantly as you type, entirely on the client side with no server round-trips.
+
+## How the Game Library Works
+
+When the page loads, a small JavaScript block fetches the game catalog and builds the tile grid:
+
+```javascript
+let games = [];
+fetch("config/games.json")
+  .then((response) => response.json())
+  .then((data) => {
+    games = data;
+    const container = document.getElementById("game-container");
+    data.forEach((project) => {
+      const game = document.createElement("a");
+      game.href = project.link;
+      game.className = "game-link container";
+      game.innerHTML = `
+        <div class="game-tile gameblur">
+          <img class="game-icon" src="${project.imgSrc}" alt="icon" />
+          <p class="game-title">${project.title}</p>
+        </div>`;
+      container.appendChild(game);
+    });
+    document.getElementById("loader").style.display = "none";
+  })
+  .catch((error) => console.error("Error:", error));
+```
+
+The live search filters the in-memory `games` array and re-renders only the matching tiles:
+
+```javascript
+function searchGames() {
+  const input = document.getElementById("search");
+  const filter = input.value.toUpperCase();
+  const container = document.getElementById("game-container");
+  container.innerHTML = "";
+  games
+    .filter((game) => game.title.toUpperCase().includes(filter))
+    .forEach((project) => {
+      // same tile-rendering logic as above
+    });
+}
+```
+
+## Game Catalog Format
+
+Each entry in `config/games.json` is a plain JSON object with three fields. Games are served from the `/projects/` subdirectory, where every title has its own folder containing an `index.html`.
+
+```json
+[
+  {
+    "link": "projects/2048/index.html",
+    "imgSrc": "projects/2048/thumb.png",
+    "title": "2048"
+  },
+  {
+    "link": "projects/1v1lol/",
+    "imgSrc": "projects/1v1lol/1v1lol.png",
+    "title": "1v1.LOL"
+  },
+  {
+    "link": "projects/cookie-clicker/index.html",
+    "imgSrc": "projects/cookie-clicker/cookie1.jpeg",
+    "title": "Cookie Clicker"
+  },
+  {
+    "link": "projects/among-us/index.html",
+    "imgSrc": "projects/among-us/red.png",
+    "title": "Among Us"
+  }
+]
+```
+
+| Field      | Description                                                  |
+| ---------- | ------------------------------------------------------------ |
+| `link`     | Relative path to the game's entry point inside `/projects/`  |
+| `imgSrc`   | Relative path to the game's icon or thumbnail image          |
+| `title`    | Display name shown beneath the icon on the tile              |
+
+## Featured Games
+
+The homepage spotlights three fan-favourite titles to get you started quickly.
+
+<CardGroup cols={3}>
+  <Card title="Snow Rider 3D" icon="snowflake">
+    A fast-paced 3D sledding game — dodge trees and collect gifts as you rocket downhill.
+  </Card>
+  <Card title="1v1.LOL" icon="crosshairs">
+    Build, aim, and outplay opponents in this competitive browser-based shooter.
+  </Card>
+  <Card title="Cookie Clicker" icon="cookie">
+    The classic idle clicker — bake cookies, unlock grandmas, and ascend to cookie godhood.
+  </Card>
+</CardGroup>
+
+## Game Library by Genre
+
+<Accordion title="Action & Shooter">
+  - **1v1.LOL** — Competitive build-and-shoot arena game
+  - **Krunker** — Fast first-person shooter with pixel-art graphics
+  - **Rooftop Snipers** — Two-player rooftop sniper duel
+  - **Getaway Shootout** — Chaotic multiplayer escape game
+  - **Endless War 3** — Side-scrolling combat action
+  - **Tactical Assassin 2** — Stealth sniper missions
+  - **Smoking Barrels** — Wild-west shooting gallery
+  - **Storm the House 2** — Wave-based base defence
+  - **Matrix Rampage** — Side-scrolling brawler
+  - **Stick War** — Real-time strategy meets action
+</Accordion>
+
+<Accordion title="Puzzle & Strategy">
+  - **2048** — Slide and merge numbered tiles to reach 2048
+  - **Bloons TD** — Classic tower-defence with balloon-popping monkeys
+  - **Bloons TD 2** — Sequel with more towers and maps
+  - **Minesweeper** — The timeless grid-based deduction game
+  - **Bloxors** — Roll a block to the goal without falling off
+  - **Cut the Rope** — Physics puzzles for the candy-hungry Om Nom
+  - **Cut the Rope Holiday** — Festive edition of the rope-cutting puzzler
+  - **Cut the Rope Time Travel** — Historical twist on the original
+  - **Hex Empire** — Turn-based hex-grid conquest
+  - **Pandemic 2** — Simulate a global outbreak and infect the world
+  - **Sort the Court** — Kingdom-management decision game
+  - **The Final Earth** — Colony-building city sim
+  - **Cell Machine** — Logic-based cellular automaton puzzler
+  - **Push the Square** — Minimalist block-pushing puzzles
+  - **Wordle** — Guess the five-letter word in six tries
+</Accordion>
+
+<Accordion title="Clicker & Idle">
+  - **Cookie Clicker** — The definitive idle clicker
+  - **CS:GO Clicker** — Unlock skins by clicking your way through cases
+  - **Particle Clicker** — Science-themed idle clicker set in a particle lab
+  - **Doge Miner** — Mine Dogecoin and upgrade your rocket to the moon
+  - **Idle Breakout** — Idle twist on the classic Breakout arcade game
+  - **Idle Shark** — Grow your shark by eating everything in sight
+  - **You Are Jeff Bezos** — Satirical idle game about spending a trillion dollars
+</Accordion>
+
+<Accordion title="Platformer & Runner">
+  - **Chrome Dino** — The iconic T-Rex runner from Chrome's offline page
+  - **Flappy Bird** — Tap to keep the bird airborne between pipes
+  - **Doodle Jump** — Bounce upward through an endless procedural world
+  - **Slope** — Navigate a ball down an ever-steepening neon slope
+  - **Tunnel Rush** — Dodge obstacles hurtling through a psychedelic tube
+  - **Temple Run 2** — Sprint, slide, and turn through ancient ruins
+  - **Snow Rider 3D** — 3D sledding with obstacles and collectibles
+  - **MotoX3M** — Stunt-heavy motorcycle racing
+  - **MotoX3M Pool** — Pool-party edition of the moto stunter
+  - **MotoX3M Spooky** — Halloween-themed track pack
+  - **MotoX3M Winter** — Snow and ice tracks
+  - **Vex 3 / 4 / 5 / 6** — Precision platformer series with deadly traps
+  - **Big Tower Tiny Square** — Brutally tall vertical platformer
+  - **Death Run 3D** — First-person obstacle-course runner
+  - **Retro Bowl** — Retro-style American football runner
+</Accordion>
+
+<Accordion title="Multiplayer & Social">
+  - **Among Us** — Hidden-role social deduction in space
+  - **1v1.space** — Head-to-head arena battles
+  - **Paper.io 2** — Claim territory while cutting off rivals
+  - **Smash Carts** — Kart combat with power-ups
+  - **Tank Trouble 2** — Two- and three-player tank battle in a maze
+  - **Tube Jumpers** — Chaotic local-multiplayer raft game
+  - **Snowbattle** — Snowball-throwing arena
+  - **Basketball Stars** — One-on-one basketball showdown
+</Accordion>
+
+<Accordion title="Sandbox & Simulation">
+  - **Minecraft Classic** — The official browser version of classic Minecraft
+  - **Eaglercraft** — Open-source Minecraft 1.5 port for the browser
+  - **Precision Client (Eaglercraft)** — Enhanced Eaglercraft client
+  - **Sand Game** — Falling-sand physics sandbox
+  - **Grind Craft** — Idle crafting and resource-gathering sim
+  - **CraftMine** — Minecraft-inspired crafting game
+  - **Super Mario 64** — Full SM64 port running in the browser via WebAssembly
+  - **HexGL** — High-speed futuristic racing on a hex track
+  - **Web Retro Local** — Emulator hub for classic console ROMs
+  - **Hacker Typer** — Look like a hacker by mashing any key
+</Accordion>
+
+<Accordion title="Classic & Arcade">
+  - **Flash Tetris** — Classic stacking block puzzle
+  - **Hextris** — Hexagonal spin on Tetris
+  - **Google Snake** — The modernised Google Snake game
+  - **Helicopter** — Steer a helicopter through cavern walls
+  - **Cubefield** — Dodge an endless field of 3D cubes
+  - **NS-Shaft** — Descend a shaft of disappearing platforms
+  - **Double Wires** — Grapple between pillars like Spider-Man
+  - **Stack** — Drop and align falling blocks to build a tower
+  - **Mini-putt** — Miniature golf with tricky holes
+  - **Solitaire** — Classic Klondike card solitaire
+  - **Wolfenstein 3D** — The original first-person shooter, fully in-browser
+  - **Portal (Flash)** — Flash-era adaptation of Valve's Portal
+</Accordion>
+
+<Info>
+  The full library contains **147 games**. Use the search bar on the Games page to filter by name — results update instantly as you type, with no network request needed after the initial page load.
+</Info>

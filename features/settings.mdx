@@ -1,0 +1,140 @@
+---
+title: "Settings & Privacy Tools in Cody's Shack"
+sidebarTitle: "Settings"
+description: "Cloak your browser tab with a custom title and favicon, or launch any URL in an about:blank window to keep your session discreet."
+---
+
+The Settings page (`misc.html`) — labelled **Settings** in the navigation bar — is home to two lightweight privacy utilities: the **Tab Cloaker** and the **about:blank Opener**. Neither tool requires an account or any configuration beyond what you enter in the inputs. Both tools are powered by plain JavaScript in `js/misc.js`, with `js/main.js` re-applying your saved preferences on every page load across the entire site.
+
+---
+
+## Tab Cloaker
+
+The Tab Cloaker lets you replace the browser tab's title and favicon with anything you like. Your choices are saved to `localStorage`, so they persist across page reloads and apply site-wide — not just on the Settings page.
+
+### How it applies on every page
+
+`js/main.js` runs on every page of Cody's Shack. At load time it reads your saved preferences from `localStorage` and applies them immediately:
+
+```javascript
+const local_title = localStorage.getItem("title");
+const local_icon = localStorage.getItem("icon");
+
+if (window.localStorage.hasOwnProperty("title")) {
+  document.title = local_title;
+}
+if (window.localStorage.hasOwnProperty("icon")) {
+  document.querySelector("link[rel=icon]").href = local_icon;
+}
+```
+
+### The cloaker functions (js/misc.js)
+
+```javascript
+const changeTabTitle = () => {
+  const tcInput = document.getElementById("userinput");
+  if (tcInput.value == "") {
+    window.localStorage.removeItem("title");
+    output("No title entered. Default applied, refresh to see changes", "red");
+  } else {
+    window.localStorage.setItem("title", tcInput.value);
+    window.document.title = tcInput.value;
+    output("Title change successful", "green");
+  }
+  tcInput.value = "";
+};
+
+const changeTabIcon = () => {
+  if (tcInput.value === "") {
+    document.querySelector("link[rel*='icon']").href = "";
+    window.localStorage.removeItem("icon");
+    output("No image entered. Default applied, refresh to see changes", "red");
+  } else if (validURL(tcInput.value)) {
+    document.querySelector("link[rel*='icon']").href = tcInput.value;
+    window.localStorage.setItem("icon", tcInput.value);
+    output("Icon change successful", "green");
+  } else {
+    output("Icon change failed. Make sure you are using a valid URL", "red");
+  }
+  tcInput.value = "";
+};
+
+const resetTabSettings = () => {
+  let items = ["icon", "title"];
+  items.forEach((item) => window.localStorage.removeItem(item));
+  window.location.reload();
+};
+```
+
+The `validURL()` helper validates the icon input against a regex before saving it, so entering a plain word instead of a URL will produce a red error message rather than a broken icon.
+
+### Using the Tab Cloaker
+
+<Steps>
+  <Step title="Set a custom tab title">
+    Type any text into the input field on the Settings page and click **Set Title**. The tab title changes instantly, and the value is saved to `localStorage` so it persists on every page of the site.
+  </Step>
+  <Step title="Set a custom favicon">
+    Paste a valid image URL into the same input field and click **Set Icon**. The favicon in your browser tab updates immediately. The URL must begin with `http://` or `https://` to pass validation.
+  </Step>
+  <Step title="Reset to defaults">
+    Click **Reset** to clear both `title` and `icon` from `localStorage` and reload the page, restoring the original Cody's Shack tab title and favicon.
+  </Step>
+</Steps>
+
+<Tip>
+  For maximum camouflage, use the URL of a recognisable website's favicon as your icon. For example, Google's favicon — `https://www.google.com/favicon.ico` — combined with the title **"Google Docs"** makes the tab look indistinguishable from a legitimate school or work assignment. Pair it with a similarly convincing about:blank window (see below) for an extra layer of cover.
+</Tip>
+
+---
+
+## about:blank Opener
+
+The about:blank Opener loads any URL you choose inside a brand-new browser window whose address bar reads `about:blank`. Because the window is opened programmatically, the URL bar never shows the game site's domain — it shows only `about:blank`.
+
+### How it works (js/misc.js)
+
+```javascript
+document.getElementById("create").onclick = function () {
+  // Normalise the URL to always use https://
+  if (!url.value.startsWith("https://") && !url.value.startsWith("http://")) {
+    url.value = `https://${url.value.split("https://").pop()}`;
+  } else if (url.value.startsWith("http://")) {
+    url.value = `https://${url.value.split("http://").pop()}`;
+  }
+
+  // Open a blank window and inject a borderless, full-viewport iframe
+  const win = window.open();
+  win.document.body.style.margin = "0";
+  win.document.body.style.height = "100vh";
+  const iframe = win.document.createElement("iframe");
+  iframe.style.border = "none";
+  iframe.style.width = "100%";
+  iframe.style.height = "100%";
+  iframe.style.margin = "0";
+  iframe.referrerpolicy = "no-referrer";
+  iframe.allow = "fullscreen";
+  iframe.src = url.value;
+  win.document.body.appendChild(iframe);
+};
+```
+
+The script forces HTTPS, opens a new window, then injects a borderless `<iframe>` that fills the entire viewport. The `referrerpolicy="no-referrer"` attribute prevents the destination site from seeing where the request originated.
+
+### Using the about:blank Opener
+
+<Steps>
+  <Step title="Enter a URL">
+    Type or paste the URL you want to open into the input field under the **about:blank** heading. You can omit the `https://` prefix — the script will add it automatically.
+  </Step>
+  <Step title="Click Create page">
+    Click the **Create page** button. A new browser window will open. Its address bar will show `about:blank` regardless of which site is loaded inside the iframe.
+  </Step>
+  <Step title="Use the window normally">
+    The target site fills the entire window with no borders, toolbars, or branding from Cody's Shack. Close the window when you are done — nothing is saved.
+  </Step>
+</Steps>
+
+<Note>
+  Some websites send `X-Frame-Options: DENY` or `Content-Security-Policy: frame-ancestors 'none'` headers that prevent them from being displayed inside an iframe, even inside an about:blank window. If the target page appears blank, this restriction is the most likely cause. As a workaround, consider using the URL of the Cody's Shack game page itself inside the about:blank opener for a second layer of concealment, as the site does not block its own frames.
+</Note>

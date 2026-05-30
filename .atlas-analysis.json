@@ -1,0 +1,67 @@
+{
+  "projectType": "saas",
+  "projectName": "Cody's Shack Games",
+  "projectDescription": "A self-deployable, ad-free browser game site with 147+ embedded games, website proxies, movie streaming, and tab-cloaking utilities — designed for easy customization and self-hosting.",
+  "theme": "almond",
+  "primaryColor": "#b625cc",
+  "lightColor": "#d45de8",
+  "darkColor": "#8a1a99",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Overview",
+        "pages": [
+          "introduction",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Features",
+        "pages": [
+          "features/games",
+          "features/websites",
+          "features/movies",
+          "features/settings"
+        ]
+      },
+      {
+        "group": "Self-Hosting",
+        "pages": [
+          "self-hosting/deployment",
+          "self-hosting/configuration",
+          "self-hosting/adding-games"
+        ]
+      },
+      {
+        "group": "Customization",
+        "pages": [
+          "customization/ui-styling",
+          "customization/tab-cloaker"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "147+ embedded browser games accessible from one site",
+    "Website proxy panel with tabs for YouTube, Discord, Spotify, and more",
+    "Movie streaming integration via embedded iframe",
+    "Tab cloaker: rename browser tab title and favicon via localStorage",
+    "about:blank window opener for additional stealth browsing",
+    "Live search filtering for both games and apps",
+    "No ads, no tracking — fully client-side",
+    "Animated rainbow glow button effects and glassmorphism UI",
+    "Random rotating subtitle on homepage",
+    "Fully customizable via JSON config files"
+  ],
+  "publicApiSurface": [
+    "config/games.json — array of { title, link, imgSrc } game entries",
+    "config/apps.json — array of { title, link, imgSrc } website proxy entries",
+    "js/main.js — localStorage title/icon cloaking applied globally on page load",
+    "js/misc.js — changeTabTitle(), changeTabIcon(), resetTabSettings(), applyUrl(url, title)",
+    "js/subtitle.js — getRandomGreeting() returns a random subtitle string",
+    "misc.html — about:blank opener and tab cloaker UI",
+    "projects.html — game library with live search",
+    "apps.html — website proxy panel with live search",
+    "movies.html — embedded movie streaming iframe"
+  ]
+}

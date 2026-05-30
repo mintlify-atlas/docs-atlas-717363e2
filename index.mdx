@@ -1,20 +1,56 @@
 ---
-title: "Introduction"
-description: "Welcome to your project"
+title: "Cody's Shack Games: Ad-Free Self-Hostable Game Portal"
+sidebarTitle: "Home"
+description: "Cody's Shack is an open-source, self-deployable game site with 147+ browser games, website proxies, movie streaming, and privacy utilities — zero ads, zero tracking."
 ---
 
-Write a short description of your product here. What it does, who it's for, and what they can accomplish with it.
+Welcome to the official documentation for **Cody's Shack Games** — a lightweight, clean, and fully self-hostable browser game portal. Play 147+ embedded games, access popular websites through built-in proxies, stream movies, and use privacy tools like the tab cloaker, all without ads or tracking.
 
-<Tip>
-  Ready to make this your own? Start by editing this page. Update your `docs.json` file to customize your site. Then fill out the [Quickstart](/quickstart) page.
-</Tip>
+<CardGroup cols={2}>
+  <Card title="Introduction" icon="book-open" href="/introduction">
+    Learn what Cody's Shack is, how it works, and what makes it different from other game sites.
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get your own instance of Cody's Shack up and running in minutes.
+  </Card>
+  <Card title="Game Library" icon="gamepad" href="/features/games">
+    Browse and search 147+ embedded browser games, all hosted locally.
+  </Card>
+  <Card title="Self-Hosting" icon="server" href="/self-hosting/deployment">
+    Deploy Cody's Shack on any static host — Netlify, Vercel, GitHub Pages, or your own server.
+  </Card>
+</CardGroup>
 
-<Card title="Quickstart" icon="rocket" href="/quickstart">
-  This card links to the quickstart page in your project.
-</Card>
-<Card title="Components" icon="puzzle-piece" href="https://mintlify.com/docs/components">
-  Add cards, callouts, steps, tabs, and more to design and structure your pages.
-</Card>
-<Card title="Settings" icon="gear" href="https://mintlify.com/docs/organize/settings">
-  Set your site name, branding, and navigation in the `docs.json` file.
-</Card>
+## What's inside
+
+<CardGroup cols={2}>
+  <Card title="Website Proxies" icon="globe" href="/features/websites">
+    Access YouTube, Discord, Spotify, Reddit, and more through built-in iframe proxies.
+  </Card>
+  <Card title="Movie Streaming" icon="film" href="/features/movies">
+    Watch movies directly from the site via an embedded streaming integration.
+  </Card>
+  <Card title="Tab Cloaker" icon="eye-slash" href="/features/settings">
+    Disguise your browser tab with a custom title and favicon for extra privacy.
+  </Card>
+  <Card title="Configuration" icon="gear" href="/self-hosting/configuration">
+    Customize games, apps, and UI behavior using simple JSON config files.
+  </Card>
+</CardGroup>
+
+## Getting started
+
+<Steps>
+  <Step title="Fork or download the repository">
+    Grab the source from [GitHub](https://github.com/theinfamouscoder5/codys-shack-games) and clone it locally or directly deploy it to your static host of choice.
+  </Step>
+  <Step title="Configure your game library">
+    Edit `config/games.json` to add, remove, or reorder games. Each entry needs a `title`, `link`, and `imgSrc`.
+  </Step>
+  <Step title="Deploy to a static host">
+    Upload the entire project directory to any static file host. No build step is required — it's all plain HTML, CSS, and JavaScript.
+  </Step>
+  <Step title="Start playing">
+    Open your deployed URL and navigate to the Games page to start playing immediately.
+  </Step>
+</Steps>

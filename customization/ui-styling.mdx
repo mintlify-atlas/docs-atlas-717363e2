@@ -1,0 +1,177 @@
+---
+title: "Customize the Look and Feel of Cody's Shack"
+sidebarTitle: "UI Styling"
+description: "Learn how to customize backgrounds, color accents, glow effects, glassmorphism panels, and game tile appearance across Cody's Shack."
+---
+
+Cody's Shack uses **Bootstrap 4** for its responsive grid and layout, with all site-specific visual styles written as inline CSS or embedded `<style>` blocks directly inside the HTML files — there is no external CSS preprocessor or build step involved. To change how the site looks, you edit the relevant HTML file and redeploy. The sections below walk through every major visual element and exactly what to change.
+
+<Tip>
+  Before editing any source file, open your browser's DevTools (`F12` → **Elements** tab) and live-edit the CSS directly in the browser. Once you're happy with how something looks, copy the values back into the source HTML.
+</Tip>
+
+---
+
+## Background
+
+### Homepage (`index.html`)
+
+The homepage `<body>` tag uses an inline `background-image` style that layers a dark semi-transparent gradient over an animated GIF:
+
+```html
+<body style="
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.5)
+  ), url('codys-shack-background.gif');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: #000000;
+">
+```
+
+To swap the background image, replace `codys-shack-background.gif` with the path to your own file (GIF, JPG, PNG, or WebP all work). To lighten or darken the overlay, adjust the `0.5` alpha values on the `rgba(0, 0, 0, ...)` gradient stops.
+
+### Game, Websites, and Settings pages
+
+All pages other than `index.html` use a plain solid dark background set on the `<body>` tag:
+
+```html
+<body style="background-color: #121212;">
+```
+
+Replace `#121212` with any valid CSS color to change the background on those pages.
+
+---
+
+## Color Accents
+
+Two accent colors appear throughout the site's buttons and navigation:
+
+| Color | Hex | Used on |
+|---|---|---|
+| Purple | `#b625cc` | Settings button (homepage), action buttons (`misc.html`, `projects.html`) |
+| Green | `#22c55e` | CTA buttons on the games page, the "Go to homepage" button |
+
+To change an accent color, do a find-and-replace of the hex value inside the relevant HTML file. For example, to change the purple to a teal, replace every instance of `#b625cc` with `#0d9488` in `index.html` and `misc.html`.
+
+---
+
+## Glow Button Effect
+
+The `.glow-on-hover` CSS class creates an animated rainbow gradient border that appears on hover. It is defined in an embedded `<style>` block inside `index.html` and used on the primary CTA buttons site-wide.
+
+```css
+.glow-on-hover:before {
+  content: '';
+  background: linear-gradient(
+    45deg,
+    #ff0000, #ff7300, #fffb00, #48ff00,
+    #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000
+  );
+  background-size: 400%;
+  animation: glowing 20s linear infinite;
+}
+```
+
+The `@keyframes glowing` rule cycles the gradient's `background-position` from `0 0` → `400% 0` → `0 0` over 20 seconds, creating the sweeping color animation. To customize:
+
+- **Change the colors** — edit the `linear-gradient(...)` color stops inside `.glow-on-hover:before`.
+- **Speed up or slow down the animation** — change `20s` in `animation: glowing 20s linear infinite`.
+- **Increase glow spread** — increase the `filter: blur(5px)` value on the `:before` pseudo-element.
+
+---
+
+## Glassmorphism Panels
+
+The frosted-glass card style is applied via the `.blur` class, embedded in `index.html` and replicated as `.gameblur` on `projects.html`:
+
+```css
+.blur {
+  background-color: rgba(100, 100, 100, 0.4) !important;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  padding: 20px;
+  border-radius: 20px;
+  -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
+}
+```
+
+To adjust the glass effect:
+
+- **Blur intensity** — change `blur(5px)` in `backdrop-filter`. Higher values produce a more opaque frost effect.
+- **Panel opacity** — change the `0.4` alpha value in `rgba(100, 100, 100, 0.4)`. A value closer to `0` is more transparent; closer to `1` is more opaque.
+- **Corner roundness** — change `border-radius: 20px`.
+- **Inner shadow depth** — edit `rgba(0, 0, 0, 0.6)` in the `box-shadow` declaration.
+
+---
+
+## Animated Homepage Subtitle
+
+Directly below the site title on the homepage, a randomized subtitle line is injected by `js/subtitle.js` every time the page loads. The script picks one entry at random from a 70+ item `greetings` array:
+
+```javascript
+function getRandomGreeting() {
+  var greetings = [ /* array of strings */ ];
+  var randomIndex = Math.floor(Math.random() * greetings.length);
+  return greetings[randomIndex];
+}
+document.getElementById("subtitle").innerText = getRandomGreeting();
+```
+
+The result is written into the element with `id="subtitle"` on `index.html`. To add your own subtitles, open `js/subtitle.js` and append new strings to the `greetings` array:
+
+```javascript
+var greetings = [
+  "Beep boop! Are you a robot?",
+  "Did you know I have a discord server?",
+  // ... existing entries ...
+  "Your custom subtitle here!",
+  "Another one!",
+];
+```
+
+The subtitle element is also styled with the `.slant-container` class, which applies a slight rotation and an animated font-size pulse via `@keyframes mymove`.
+
+---
+
+## Game Tile Appearance
+
+Game cards on the `projects.html` page are built from two CSS classes defined in that file's `<style>` block:
+
+<CardGroup cols={2}>
+  <Card title=".game-tile" icon="square">
+    Dark semi-transparent card container.
+
+    ```css
+    .game-tile {
+      background-color: #383333;
+      height: 330px;
+      width: 290px;
+      border-radius: 20px;
+      transition: transform 0.2s ease-in-out;
+      transition-duration: 0.4s;
+    }
+
+    .game-tile:hover {
+      transform: scale(1.03);
+      cursor: pointer;
+    }
+    ```
+  </Card>
+  <Card title=".game-icon" icon="image">
+    Thumbnail image inside the tile.
+
+    ```css
+    .game-icon {
+      border-radius: 30px;
+      width: 210px;
+      height: 210px;
+      top: 5%;
+      position: relative;
+    }
+    ```
+  </Card>
+</CardGroup>
+
+To change the tile color, replace `#383333` in `.game-tile`. To make tiles larger or smaller, adjust the `height` and `width` values and update `.game-icon` dimensions proportionally. To change the hover scale intensity, edit the `scale(1.03)` value in `.game-tile:hover`.

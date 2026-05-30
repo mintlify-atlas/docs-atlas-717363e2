@@ -1,0 +1,64 @@
+---
+title: "Cody's Shack Games: Lightweight Ad-Free Game Portal"
+sidebarTitle: "Introduction"
+description: "Cody's Shack Games is a self-hostable, ad-free browser game portal with 147+ embedded games, website proxies, movie streaming, and tab-cloaking tools."
+---
+
+Cody's Shack Games is a self-deployable browser game portal built on top of [3kh0 Lite](https://github.com/3kh0/3kh0-lite). It ships as a collection of plain HTML, CSS, and JavaScript files — no build system, no server-side runtime, no dependencies to install. Every game runs entirely in the browser, the game list is driven by a single JSON config file, and the whole thing can be dropped onto any static file host and served immediately. The project was originally created by Cody as a clean, fast alternative to ad-heavy game aggregators, and grew to include website proxies, a movie streaming page, and a tab-cloaking utility before being superseded by the newer Cody's Shack organisation.
+
+<Note>
+  This repository is **archived and no longer actively maintained**. It has been merged into the newer Cody's Shack project. For the current, supported version visit [https://github.com/codys-shack](https://github.com/codys-shack). The legacy source discussed on this page lives at [https://github.com/theinfamouscoder5/codys-shack-games](https://github.com/theinfamouscoder5/codys-shack-games).
+</Note>
+
+## Key features
+
+- **147+ embedded games** — all game assets are bundled inside the `projects/` folder and served directly from your host; no third-party game CDN required.
+- **No ads, no tracking** — there are no ad networks, no analytics scripts injected into game pages, and no user accounts.
+- **Tab cloaker** — the Settings page (`misc.html`) lets users change the browser tab title and favicon on the fly via `localStorage`, making the site appear to be something else at a glance.
+- **Website proxies** — the Websites section (`apps.html`) embeds popular sites (YouTube, Discord, Spotify, Reddit, and more) inside iframe proxy pages so they can be accessed from restricted networks.
+- **Movie streaming** — the Movies page provides an embedded streaming interface alongside the game and app sections.
+- **Fully client-side** — every page is static HTML. Game discovery happens entirely in the browser: `projects.html` fetches `config/games.json` with the `fetch()` API and renders clickable tiles dynamically with vanilla JavaScript.
+
+## Technology stack
+
+| Layer | Technology |
+|---|---|
+| Markup | Plain HTML5 |
+| Styling | Bootstrap 4 (CDN) + hand-written CSS |
+| Scripting | Vanilla JavaScript (ES6+) |
+| Game list | `config/games.json` (client-side `fetch()`) |
+| App list | `config/apps.json` (client-side `fetch()`) |
+| Build system | None — open `index.html` and go |
+
+## How the game list works
+
+When a visitor navigates to `projects.html`, the page fires a `fetch()` call to `config/games.json`. The JSON array is iterated and each entry is turned into an anchor element containing a styled tile with a thumbnail image and a title. A live search input filters the rendered tiles by title string without any page reload. The same pattern is used by `apps.html` reading from `config/apps.json`.
+
+```json
+[
+  {
+    "link": "projects/2048/index.html",
+    "imgSrc": "projects/2048/thumb.png",
+    "title": "2048"
+  }
+]
+```
+
+Each entry needs exactly three fields: `link` (path to the game's `index.html`), `imgSrc` (path to its thumbnail), and `title` (display name shown on the tile).
+
+## Site sections
+
+<CardGroup cols={2}>
+  <Card title="Games" icon="gamepad">
+    Over 147 browser games bundled in the `projects/` directory — from classics like 2048, Cookie Clicker, and Flappy Bird to larger titles like Eaglercraft, Super Mario 64, and Snow Rider 3D. Games are discovered at runtime from `config/games.json` and displayed as searchable tiles on `projects.html`.
+  </Card>
+  <Card title="Websites" icon="globe">
+    Proxy wrappers for popular sites including YouTube, Discord, Spotify, TikTok, Reddit, Google, Twitch, and Cool Math Games. Each entry in `config/apps.json` maps to a lightweight iframe page under the `apps/` directory, allowing access from networks that block those domains directly.
+  </Card>
+  <Card title="Movies" icon="film">
+    An embedded movie streaming interface accessible from the top navigation bar. Like the rest of the site it requires no server-side code — the page loads entirely from static files served alongside the game and app sections.
+  </Card>
+  <Card title="Settings" icon="sliders">
+    The Settings page (`misc.html`) exposes the tab-cloaking feature. Users can set a custom browser tab title and favicon URL; values are written to `localStorage` and applied on every page load by `js/main.js`, making the site look like an unrelated page to a casual observer.
+  </Card>
+</CardGroup>

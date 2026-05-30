@@ -1,0 +1,174 @@
+---
+title: "Tab Cloaker: Disguise Your Browser Tab on Cody's Shack"
+sidebarTitle: "Tab Cloaker"
+description: "Use Cody's Shack's built-in tab cloaker to replace the browser tab title and favicon so the site looks like something else entirely."
+---
+
+The Tab Cloaker lets you replace both the browser tab title and the favicon shown in the tab bar, making the site look like a completely different page — a school assignment tool, a document editor, or anything you choose. Your settings are saved to the browser's `localStorage` under the `title` and `icon` keys and are automatically reapplied on every page load across the entire site, because every page includes `js/main.js`.
+
+<Note>
+  Tab cloaker settings are stored in your **browser's** `localStorage`. They are device- and browser-specific — settings will not carry over if you switch to a different browser, a different device, or an incognito/private window. Incognito mode uses a fresh, isolated storage context that is wiped when the window closes.
+</Note>
+
+---
+
+## Using the Tab Cloaker (UI)
+
+Navigate to **Settings** (`misc.html`) to access the Tab Cloaker panel. All three actions use the single `#userinput` text field.
+
+<Steps>
+  <Step title="Open the Settings page">
+    Click **Settings** in the navigation bar, or go directly to `misc.html`.
+  </Step>
+  <Step title="Set a custom tab title">
+    Type your desired title (e.g., `Google Classroom`) into the input field and click **Set Title**. The tab title updates instantly and the value is saved so it persists across page navigations.
+  </Step>
+  <Step title="Set a custom favicon">
+    Replace the text in the input field with a full image URL pointing to the favicon you want (e.g., a `.ico` or `.png` URL), then click **Set Icon**. The tab favicon updates immediately.
+  </Step>
+  <Step title="Reset to defaults">
+    Click **Reset** at any time to clear both the custom title and favicon and reload the page with the original site defaults.
+  </Step>
+</Steps>
+
+<Tip>
+  A quick way to make the tab look like a school tool is to use the Google Classroom favicon URL:
+  `https://ssl.gstatic.com/classroom/favicon.png`. Pair it with the title `Google Classroom` for a convincing disguise.
+</Tip>
+
+---
+
+## JavaScript API
+
+All tab cloaker logic lives in `js/misc.js`. The four functions below are what the Settings page buttons call, and they can also be invoked programmatically if you extend the site.
+
+<Accordion title="changeTabTitle()">
+Reads the current value of the `#userinput` field and updates the tab title.
+
+- **Empty input** — removes `localStorage["title"]` and displays a message prompting a refresh to restore the default.
+- **Non-empty input** — calls `localStorage.setItem("title", value)` and sets `document.title` immediately.
+
+```javascript
+const changeTabTitle = () => {
+  const tcInput = document.getElementById("userinput");
+  if (tcInput.value == "") {
+    window.localStorage.removeItem("title");
+    output("No title entered. Default applied, refresh to see changes", "red");
+  } else {
+    window.localStorage.setItem("title", tcInput.value);
+    window.document.title = tcInput.value;
+    output("Title change successful", "green");
+  }
+  tcInput.value = "";
+};
+```
+</Accordion>
+
+<Accordion title="changeTabIcon()">
+Reads the current value of the `#userinput` field and updates the favicon `<link>` element.
+
+- **Empty input** — clears the favicon `href` and removes `localStorage["icon"]`.
+- **Valid URL** — sets `localStorage.setItem("icon", value)` and updates `document.querySelector("link[rel*='icon']").href` immediately.
+- **Invalid URL** — displays an error message; no storage change is made.
+
+URL validation is performed by the `validURL()` helper using this regular expression:
+
+```javascript
+const validURL = (str) => {
+  const exp = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+  const reg = new RegExp(exp);
+  return !!reg.test(str);
+};
+```
+
+The full `changeTabIcon` function:
+
+```javascript
+const changeTabIcon = () => {
+  if (tcInput.value === "") {
+    document.querySelector("link[rel*='icon']").href = "";
+    window.localStorage.removeItem("icon");
+    output("No image entered. Default applied, refresh to see changes", "red");
+  } else if (validURL(tcInput.value)) {
+    document.querySelector("link[rel*='icon']").href = tcInput.value;
+    window.localStorage.setItem("icon", tcInput.value);
+    output("Icon change successful", "green");
+  } else {
+    output("Icon change failed. Make sure you are using a valid URL", "red");
+  }
+  tcInput.value = "";
+};
+```
+</Accordion>
+
+<Accordion title="resetTabSettings()">
+Removes both `title` and `icon` from `localStorage` and reloads the current page, restoring all site defaults.
+
+```javascript
+const resetTabSettings = () => {
+  let items = ["icon", "title"];
+  items.forEach((item) => window.localStorage.removeItem(item));
+  window.location.reload();
+};
+```
+</Accordion>
+
+<Accordion title="applyUrl(url, title)">
+A convenience function that sets both a favicon URL and a tab title in a single call. It works by writing the values into the `#userinput` field and calling `changeTabIcon()` and `changeTabTitle()` sequentially. Useful for implementing one-click preset cloak buttons.
+
+```javascript
+function applyUrl(url, title) {
+  document.getElementById("userinput").value = url;
+  changeTabIcon();
+  document.getElementById("userinput").value = title;
+  changeTabTitle();
+  output("Preset applied successfully!", "green");
+}
+```
+
+**Example usage** — add a preset button in `misc.html`:
+
+```html
+<button onclick="applyUrl(
+  'https://ssl.gstatic.com/classroom/favicon.png',
+  'Google Classroom'
+)">
+  Google Classroom Preset
+</button>
+```
+</Accordion>
+
+---
+
+## How Settings Are Applied on Every Page Load
+
+`js/main.js` is loaded by every page in the site. On each load it reads the stored values from `localStorage` and applies them before the user sees the tab, so the cloak is seamless across navigation:
+
+```javascript
+const local_title = localStorage.getItem("title");
+const local_icon = localStorage.getItem("icon");
+if (window.localStorage.hasOwnProperty("title")) {
+  document.title = local_title;
+}
+if (window.localStorage.hasOwnProperty("icon")) {
+  document.querySelector("link[rel=icon]").href = local_icon;
+}
+```
+
+Because the script uses `hasOwnProperty` rather than a truthiness check, it only applies a value if the key actually exists in storage — an empty string stored under `"title"` would still be applied, while a missing key is safely ignored.
+
+---
+
+## about:blank Opener
+
+The Settings page includes a second privacy tool alongside the Tab Cloaker: the **about:blank opener**. Enter any URL in the provided field and click **Create page**. The site will:
+
+1. Open a new browser window.
+2. Set the new window's body background and dimensions.
+3. Inject a full-screen, borderless `<iframe>` pointing to your URL.
+
+The new window's URL bar displays `about:blank` rather than the game site's domain, adding an extra layer of obscurity on top of the tab cloak.
+
+<Warning>
+  The about:blank opener will **not** work with sites that set `X-Frame-Options: DENY` or a `Content-Security-Policy` header containing `frame-ancestors 'none'`. Most major platforms (Google, YouTube, etc.) block iframe embedding. It works best with sites that have no framing restrictions, or with other pages on the same deployment.
+</Warning>
